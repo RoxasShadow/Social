@@ -1,0 +1,106 @@
+!!!5
+%html
+	%head
+		%title
+			Social
+		%meta(http-equiv='Content-Type' content='text/html; charset=utf-8')
+		%meta(name='robots' content='index, follow')
+		
+		%script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js")
+		:javascript
+			function getElements(source) {
+				values = {};
+				elem = document.getElementById(source).elements;
+				for(i=0, len=elem.length; i<len; ++i)
+					if(elem[i].id != '' && elem[i].value != '')
+						values[elem[i].id] = elem[i].value;
+				return values;
+			}
+			
+			function refresh() {
+				$.getJSON('/social/user', function(data) {
+					if(data.name == null)
+						$('#current_user').html('anonymous');
+					else
+						$('#current_user').html(data.name);
+				});
+			}
+			
+			$(document).ready(function() {
+				refresh();
+				$('#createuser').click(function() {
+					$.post('/social/user.new', getElements('user.new'), function(data) {
+						alert(data);
+					});
+				});
+				$('#login').click(function() {
+					$.post('/social/user.login', getElements('user.login'), function(data) {
+						alert(data);
+						refresh();
+					});
+				});
+				$('#logout').click(function() {
+					$.get('/social/user.logout', function(data) {
+						alert(data);
+						refresh();
+					});
+				});
+			});
+	%body
+		<h2>Hi <span id="current_user"></span></h2>
+		%fieldset(id='user.new')
+			%legend
+				New user
+			%table
+				%tr
+					%td
+						Name:
+					%td
+						%input(type='text' id='name')
+				%tr
+					%td
+						Surname:
+					%td
+						%input(type='text' id='surname')
+				%tr
+					%td
+						Nickname:
+					%td
+						%input(type='text' id='nickname')
+				%tr
+					%td
+						Email:
+					%td
+						%input(type='text' id='email')
+				%tr
+					%td
+						Password:
+					%td
+						%input(type='text' id='password')
+				%tr
+					%td
+						Gender:
+					%td
+						%input(type='text' id='gender')
+			%button(id='createuser')
+				Create
+				
+		%fieldset(id='user.login')
+			%legend
+				Login
+			%table
+				%tr
+					%td
+						Nickname:
+					%td
+						%input(type='text' id='nickname')
+				%tr
+					%td
+						Password:
+					%td
+						%input(type='text' id='password')
+			%button(id='login')
+				Login
+				
+		%a(id='logout')
+			Logout
